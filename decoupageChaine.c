@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void traiterChaine(char chaine[]);
+char* traiterChainePart1(char chaine[]);
+char* traiterChainePart2(char chaine[]);
 
 void main (int argc, char** argv) {
 	/*char chaine[] = "tts2330@r-info-onyx";
@@ -14,13 +15,35 @@ void main (int argc, char** argv) {
 		}
 	}*/
 	char chaine[] = "USER tts2330a@r-info-onyx.fr";
-	traiterChaine(chaine);
+	printf("%s\n", traiterChainePart1(chaine));
+	printf("%s\n", traiterChainePart2(chaine)); //si exécution en mm temps : erreur de segmentation
 }
 
-void traiterChaine(char chaine[]) {
-	char* chaineDecoupee = strtok(chaine, "@"); //la fonction strtok découpe la chaîne selon un délimiteur : @
+char* traiterChainePart1(char chaine[]) {
+	char* chaineDecoupee = strtok(chaine, " @"); //la fonction strtok découpe la chaîne selon un délimiteur : @
+	int i=0;
+	char* login="";
 	while (chaineDecoupee!=NULL) {
-		printf("%s\n", chaineDecoupee);
-		chaineDecoupee=strtok(NULL, "@");
+		chaineDecoupee=strtok(NULL, " @");
+		i++;
+		if (i==1) {
+			login=chaineDecoupee;
+		}
 	}
+	return login;
 }
+
+char* traiterChainePart2(char chaine[]) {
+	char* chaineDecoupee = strtok(chaine, " @"); //la fonction strtok découpe la chaîne selon un délimiteur : @
+	int i=0;
+	char* login="";
+	while (chaineDecoupee!=NULL) {
+		chaineDecoupee=strtok(NULL, " @");
+		i++;
+		if (i==2) {
+			login=chaineDecoupee;
+		}
+	}
+	return login;
+}
+
