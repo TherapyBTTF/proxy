@@ -25,87 +25,59 @@ char buffer[MAXBUFFERLEN];       // Tampon de communication entre le client et l
 
 int main(int argc, char* argv[]){
 	socketServeur();
-	
+	int ecode;
 	
 	//Demander le login au client ftp à l'aide de 220
 	strcpy(buffer, "220\n");
-	write(descSockCOMServer, buffer, strlen(buffer));
-	printf("Le buffer porte apres le premier write dans DescSockComServer: %s\n", &buffer); //buffer = 220
-	read(descSockCOMServer, buffer, MAXBUFFERLEN);
-	printf("Le buffer porte apres le premier read COmServ: %s\n", &buffer); //buffer = USER xxxxx
-	//client proxy lit la réponse
-	//read(descSockCOMClient, buffer, MAXBUFFERLEN);
-	write(descSockCOMClient, buffer, strlen(buffer));
-	printf("Le buffer porte apres le write ComClient: %s\n", &buffer); //buffer = ?
-	read(descSockCOMClient, buffer, MAXBUFFERLEN);
-	printf("Le buffer porte apres le read ComClient: %s\n", &buffer); //buffer = ? 
-	//read(descSockCOMServer, buffer, MAXBUFFERLEN);
-	write(descSockCOMServer, buffer, strlen(buffer)); //
+	write(descSockCOMServer, buffer, strlen(buffer));  //buffer = 220
 	
-
-	write(descSockCOMServer, buffer, strlen(buffer));
-	
-	//client proxy lit la réponse
-	//read(descSockCOMClient, buffer, MAXBUFFERLEœN);
-	write(descSockCOMClient, buffer, strlen(buffer));
-	
-	//read(descSockCOMServer, buffer, MAXBUFFERLEN);
-	write(descSockCOMServer, buffer, strlen(buffer));
+	ecode = read(descSockCOMServer, buffer, MAXBUFFERLEN); //buffer = USER xxxxx
+	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
+	buffer[ecode] = '\0'; 
+	write(descSockCOMClient, buffer, strlen(buffer));//buffer = USER xxxx
 	
 	
-	write(descSockCOMServer, buffer, strlen(buffer));
+	ecode = read(descSockCOMClient, buffer, MAXBUFFERLEN); //buffer = 331
+	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
+	buffer[ecode] = '\0'; 
 	
-	//client proxy lit la réponse
-	//read(descSockCOMClient, buffer, MAXBUFFERLEN);
-	write(descSockCOMClient, buffer, strlen(buffer));
+	write(descSockCOMServer, buffer, strlen(buffer)); //buffer = 331 
 	
-	//read(descSockCOMServer, buffer, MAXBUFFERLEN);
-	write(descSockCOMServer, buffer, strlen(buffer));
+	ecode = read(descSockCOMServer, buffer, MAXBUFFERLEN); //buffer = PASS xxxxx
+	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
+	buffer[ecode] = '\0';
 	
-	
-	
-	
-	//client proxy lit la réponse
-	read(descSockCOMClient, buffer, MAXBUFFERLEN);
-	write(descSockCOMClient, buffer, strlen(buffer));
-
-	read(descSockCOMServer, buffer, MAXBUFFERLEN);
-	write(descSockCOMServer, buffer, strlen(buffer));
+	write(descSockCOMClient, buffer, strlen(buffer)); //buffer = PASS xxxx
 	
 	
-	//client proxy lit la réponse
-	read(descSockCOMClient, buffer, MAXBUFFERLEN);
-	write(descSockCOMClient, buffer, strlen(buffer));
-
-	read(descSockCOMServer, buffer, MAXBUFFERLEN);
-	write(descSockCOMServer, buffer, strlen(buffer));
+	ecode = read(descSockCOMClient, buffer, MAXBUFFERLEN); //buffer = 230 User logged in.
+	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
+	buffer[ecode] = '\0'; 
+	
+	write(descSockCOMServer, buffer, strlen(buffer)); //buffer = 230
+	
+	ecode = read(descSockCOMServer, buffer, MAXBUFFERLEN); //buffer = SYST
+	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
+	buffer[ecode] = '\0';  
+	write(descSockCOMClient, buffer, strlen(buffer)); //buffer = SYST
+	
+	ecode = read(descSockCOMClient, buffer, MAXBUFFERLEN); //buffer = 215
+	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
+	buffer[ecode] = '\0'; 
+	
+	write(descSockCOMServer, buffer, strlen(buffer)); //buffer = 215
+	
+	ecode = read(descSockCOMServer, buffer, MAXBUFFERLEN); //buffer = UNIX TYPE
+	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
+	buffer[ecode] = '\0';  
+	write(descSockCOMClient, buffer, strlen(buffer)); //buffer = UNIX TYPE
 	
 	
-	//client proxy lit la réponse
-	read(descSockCOMClient, buffer, MAXBUFFERLEN);
-	write(descSockCOMClient, buffer, strlen(buffer));
-
-	read(descSockCOMServer, buffer, MAXBUFFERLEN);
-	write(descSockCOMServer, buffer, strlen(buffer));
-	
-	//client proxy lit la réponse
-	//read(descSockCOMClient, buffer, MAXBUFFERLEN);
-	
-
-/*	strcpy(buffer, "230 \n");*/
-/*	write(descSockCOMServer, buffer, strlen(buffer));*/
-/*	*/
-/*	//client proxy lit la réponse*/
-/*	read(descSockCOMClient, buffer, MAXBUFFERLEN);*/
-/*	*/
-
-/*	strcpy(buffer, "215 \n");*/
-/*	write(descSockCOMServer, buffer, strlen(buffer));*/
-/*	*/
-/*	//client proxy lit la réponse*/
-/*	read(descSockCOMClient, buffer, MAXBUFFERLEN);*/
 	
 	while (1) {
+	
+		strcpy(buffer, "227\n");
+		write(descSockCOMClient, buffer, strlen(buffer));  //Mode passive vers le serveur ????
 	}
 }
 
@@ -271,6 +243,7 @@ void socketClient() {
 	ecode = read(descSockCOMClient, buffer, MAXBUFFERLEN);
 	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
 	buffer[ecode] = '\0';
+	
 }
 
 
