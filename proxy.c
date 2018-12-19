@@ -1,42 +1,127 @@
 #include  <stdio.h>
-#include  <unistd.h>
+#include  <stdlib.h>
 #include  <sys/socket.h>
 #include  <netdb.h>
 #include  <string.h>
-#include  <stdlib.h>
 #include  <stdbool.h>
+#include  <unistd.h>
 
 #define SERVADDR "localhost"        // Définition de l'adresse IP d'écoute
-#define SERVPORT "12345"            // Définition du port d'écoute, ecoute sur 12345
+#define SERVPORT "12345"            // Définition du port d'écoute, 
                                     // si 0 port choisi dynamiquement
 #define LISTENLEN 1                 // Taille du tampon de demande de connexion
 #define MAXBUFFERLEN 1024
 #define MAXHOSTLEN 64
 #define MAXPORTLEN 6
 
-void coteServeur();
-void coteClient(int argc, char* argv[], char* message);
+void socketClient();
+void socketServeur();
 
-int main(){
-	char* login;
-	char* pass;
-	coteServeur();
-	coteClient(message);
+
+//Variables globales 
+int descSockCOMServer;                 // Descripteur de socket de communication Cliente
+int descSockCOMClient;                 // Descripteur de la socket de communication Serveur
+char buffer[MAXBUFFERLEN];       // Tampon de communication entre le client et le serveur
+
+int main(int argc, char* argv[]){
+	socketServeur();
+	
+	
+	//Demander le login au client ftp à l'aide de 220
+	strcpy(buffer, "220\n");
+	write(descSockCOMServer, buffer, strlen(buffer));
+	printf("Le buffer porte apres le premier write dans DescSockComServer: %s\n", &buffer); //buffer = 220
+	read(descSockCOMServer, buffer, MAXBUFFERLEN);
+	printf("Le buffer porte apres le premier read COmServ: %s\n", &buffer); //buffer = USER xxxxx
+	//client proxy lit la réponse
+	//read(descSockCOMClient, buffer, MAXBUFFERLEN);
+	write(descSockCOMClient, buffer, strlen(buffer));
+	printf("Le buffer porte apres le write ComClient: %s\n", &buffer); //buffer = ?
+	read(descSockCOMClient, buffer, MAXBUFFERLEN);
+	printf("Le buffer porte apres le read ComClient: %s\n", &buffer); //buffer = ? 
+	//read(descSockCOMServer, buffer, MAXBUFFERLEN);
+	write(descSockCOMServer, buffer, strlen(buffer)); //
+	
+
+	write(descSockCOMServer, buffer, strlen(buffer));
+	
+	//client proxy lit la réponse
+	//read(descSockCOMClient, buffer, MAXBUFFERLEœN);
+	write(descSockCOMClient, buffer, strlen(buffer));
+	
+	//read(descSockCOMServer, buffer, MAXBUFFERLEN);
+	write(descSockCOMServer, buffer, strlen(buffer));
+	
+	
+	write(descSockCOMServer, buffer, strlen(buffer));
+	
+	//client proxy lit la réponse
+	//read(descSockCOMClient, buffer, MAXBUFFERLEN);
+	write(descSockCOMClient, buffer, strlen(buffer));
+	
+	//read(descSockCOMServer, buffer, MAXBUFFERLEN);
+	write(descSockCOMServer, buffer, strlen(buffer));
+	
+	
+	
+	
+	//client proxy lit la réponse
+	read(descSockCOMClient, buffer, MAXBUFFERLEN);
+	write(descSockCOMClient, buffer, strlen(buffer));
+
+	read(descSockCOMServer, buffer, MAXBUFFERLEN);
+	write(descSockCOMServer, buffer, strlen(buffer));
+	
+	
+	//client proxy lit la réponse
+	read(descSockCOMClient, buffer, MAXBUFFERLEN);
+	write(descSockCOMClient, buffer, strlen(buffer));
+
+	read(descSockCOMServer, buffer, MAXBUFFERLEN);
+	write(descSockCOMServer, buffer, strlen(buffer));
+	
+	
+	//client proxy lit la réponse
+	read(descSockCOMClient, buffer, MAXBUFFERLEN);
+	write(descSockCOMClient, buffer, strlen(buffer));
+
+	read(descSockCOMServer, buffer, MAXBUFFERLEN);
+	write(descSockCOMServer, buffer, strlen(buffer));
+	
+	//client proxy lit la réponse
+	//read(descSockCOMClient, buffer, MAXBUFFERLEN);
+	
+
+/*	strcpy(buffer, "230 \n");*/
+/*	write(descSockCOMServer, buffer, strlen(buffer));*/
+/*	*/
+/*	//client proxy lit la réponse*/
+/*	read(descSockCOMClient, buffer, MAXBUFFERLEN);*/
+/*	*/
+
+/*	strcpy(buffer, "215 \n");*/
+/*	write(descSockCOMServer, buffer, strlen(buffer));*/
+/*	*/
+/*	//client proxy lit la réponse*/
+/*	read(descSockCOMClient, buffer, MAXBUFFERLEN);*/
+	
+	while (1) {
+	}
 }
 
-void coteServeur() {
+void socketServeur(){
 	int ecode;                       // Code retour des fonctions
 	char serverAddr[MAXHOSTLEN];     // Adresse du serveur
 	char serverPort[MAXPORTLEN];     // Port du server
 	int descSockRDV;                 // Descripteur de socket de rendez-vous
-	int descSockCOM;                 // Descripteur de socket de communication
+
 	struct addrinfo hints;           // Contrôle la fonction getaddrinfo
 	struct addrinfo *res;            // Contient le résultat de la fonction getaddrinfo
 	struct sockaddr_storage myinfo;  // Informations sur la connexion de RDV
 	struct sockaddr_storage from;    // Informations sur le client connecté
 	socklen_t len;                   // Variable utilisée pour stocker les 
 				                        // longueurs des structures de socket
-	char buffer[MAXBUFFERLEN];       // Tampon de communication entre le client et le serveur
+	
     
 	// Publication de la socket au niveau du système
 	// Assignation d'une adresse IP et un numéro de port
@@ -97,45 +182,50 @@ void coteServeur() {
 	len = sizeof(struct sockaddr_storage);
 	// Attente connexion du client
 	// Lorsque demande de connexion, creation d'une socket de communication avec le client
-	descSockCOM = accept(descSockRDV, (struct sockaddr *) &from, &len);
-	if (descSockCOM == -1){
+	descSockCOMServer = accept(descSockRDV, (struct sockaddr *) &from, &len);
+	if (descSockCOMServer == -1){
 		perror("Erreur accept\n");
 		exit(6);
 	}
-	// Echange de données avec le client connecté
-	strcpy(buffer, "220 BLABLABLA\n");
-	write(descSockCOM, buffer, strlen(buffer));
-	char* login = buffer;
+
 	
-	strcpy(buffer, "331 Password required\n");
-	write(descSockCOM, buffer, strlen(buffer));
-	char* pass = buffer;
+	//Lancement du client proxy
+	socketClient();
+	printf("Serveur lancé \"%s\".\n",buffer);
+	
+	//reception et transmission de la réponse au proxy-serveur, qui lui la transmet au client (ftp)
+	//transmission du password à r-info-onyx
+	//reception et transmission de la réponse au proxy-serveur, qui lui la transmet au client (ftp)
+
+
+	//boucle : on attend une commande du client (read)
+	//dés la réception, transmission de la commande au proxy-client qui la transmettra à son tour au serveur r-info-onyx
+	//on récupére la réponse du serveur r-info-unix et la transmet au proxy-serveur qui lui la transmettra à son tour au client ftp
+	//On vide le buffer et on refait la boucle.
+
 	
 	//Fermeture de la connexion
-	close(descSockCOM);
-	close(descSockRDV);
+	//close(descSockCOMServer);
+	//close(descSockRDV);
 }
 
-void coteClient(int argc, char* argv[], char* message) {
-	int descSock;                  // Descripteur de la socket
+void socketClient() {
 	int ecode;                     // Retour des fonctions
 	struct addrinfo *res,*resPtr;  // Résultat de la fonction getaddrinfo
 	struct addrinfo hints;
-	char serverName[MAXHOSTLEN] = "r-info-onyx";  // Nom de la machine serveur
-	char serverPort[MAXPORTLEN] = "12345";   // Numéro de port
-	char buffer[MAXBUFFERLEN] = message;    // Buffer stockant les messages entre 
-                                  // le client et le serveur
+	char serverName[MAXHOSTLEN] = "r-info-onyx";   // Nom de la machine serveur
+	char serverPort[MAXPORTLEN] = "21";   // Numéro de port
+	char buffer[MAXBUFFERLEN];     // Buffer stockant les messages entre le client et le serveur
 	bool isConnected = false;      // booléen indiquant que l'on est bien connecté
 
-   	//On teste les valeurs rentrées par l'utilisateur
-   	if (argc != 3){ perror("Mauvaise utilisation de la commande: <nom serveur> <numero de port>\n"); exit(1);}
-   	if (strlen(argv[1]) >= MAXHOSTLEN){ perror("Le nom de la machine serveur est trop long\n"); exit(2);}
+   	/*//On teste les valeurs rentrées par l'utilisateur
+    	if (argc != 3){ perror("Mauvaise utilisation de la commande: <nom serveur> <numero de port>\n"); exit(1);}
+    	if (strlen(argv[1]) >= MAXHOSTLEN){ perror("Le nom de la machine serveur est trop long\n"); exit(2);}
    	if (strlen(argv[2]) >= MAXPORTLEN){ perror("Le numero de port du serveur est trop long\n"); exit(2);}
     	strncpy(serverName, argv[1], MAXHOSTLEN);
     	serverName[MAXHOSTLEN-1] = '\0';
     	strncpy(serverPort, argv[2], MAXPORTLEN);
-    	serverPort[MAXPORTLEN-1] = '\0';
-
+   	serverPort[MAXPORTLEN-1] = '\0';*/
 
     
     	// Initailisation de hints
@@ -156,19 +246,19 @@ void coteClient(int argc, char* argv[], char* message) {
 	while(!isConnected && resPtr!=NULL){
 
 		//Création de la socket IPv4/TCP
-		descSock = socket(resPtr->ai_family, resPtr->ai_socktype, resPtr->ai_protocol);
-		if (descSock == -1) {
+		descSockCOMClient = socket(resPtr->ai_family, resPtr->ai_socktype, resPtr->ai_protocol);
+		if (descSockCOMClient == -1) {
 			perror("Erreur creation socket");
 			exit(2);
 		}
   
   		//Connexion au serveur
-		ecode = connect(descSock, resPtr->ai_addr, resPtr->ai_addrlen);
+		ecode = connect(descSockCOMClient, resPtr->ai_addr, resPtr->ai_addrlen);
 		if (ecode == -1) {
 			resPtr = resPtr->ai_next;    		
-			close(descSock);	
+			close(descSockCOMClient);	
 		}
-		// On a pu se connecté
+		// On a pu se connecter
 		else isConnected = true;
 	}
 	freeaddrinfo(res);
@@ -176,15 +266,12 @@ void coteClient(int argc, char* argv[], char* message) {
 		perror("Connexion impossible");
 		exit(2);
 	}
+	
 	//Echange de donneés avec le serveur
-	ecode = read(descSock, buffer, MAXBUFFERLEN);
+	ecode = read(descSockCOMClient, buffer, MAXBUFFERLEN);
 	if (ecode == -1) {perror("Problème de lecture\n"); exit(3);}
 	buffer[ecode] = '\0';
-	printf("MESSAGE RECU DU SERVEUR: \"%s\".\n",buffer);
-	//Fermeture de la socket
-	close(descSock);
 }
-
 
 
 
