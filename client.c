@@ -11,7 +11,7 @@
 #define MAXBUFFERLEN 1024
 
 int main(int argc, char* argv[]){
-	int descSock;                  // Descripteur de la socket
+
 	int ecode;                     // Retour des fonctions
 	struct addrinfo *res,*resPtr;  // Résultat de la fonction getaddrinfo
 	struct addrinfo hints;

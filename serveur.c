@@ -90,10 +90,33 @@ int main(){
 		perror("Erreur accept\n");
 		exit(6);
 	}
-	// Echange de données avec le client connecté
-	strcpy(buffer, "220 BLABLABLA\n");
 
+	//Demander le login au client à l'aide de 220
+	strcpy(buffer, "220 Demande de login\n");
 	write(descSockCOM, buffer, strlen(buffer));
+	$login = buffer;
+	buffer = "";
+
+	//Demander le pass au client à l'aide de 331 (à verifier)
+	strcpy(buffer, "220 Demande de login\n");
+	write(descSockCOM, buffer, strlen(buffer));
+	$pass = buffer;
+	buffer = "";
+	
+	//connexion au serveur r-info-onyx à l'aide de client.c (exec() ? system() ?)
+	exec("./Client" 
+	//transmission du login à r-info-onyx
+	//reception et transmission de la réponse au proxy-serveur, qui lui la transmet au client (ftp)
+	//transmission du password à r-info-onyx
+	//reception et transmission de la réponse au proxy-serveur, qui lui la transmet au client (ftp)
+
+
+	//boucle : on attend une commande du client (read)
+	//dés la réception, transmission de la commande au proxy-client qui la transmettra à son tour au serveur r-info-onyx
+	//on récupére la réponse du serveur r-info-unix et la transmet au proxy-serveur qui lui la transmettra à son tour au client ftp
+	//On vide le buffer et on refait la boucle
+
+	
 	//Fermeture de la connexion
 	close(descSockCOM);
 	close(descSockRDV);

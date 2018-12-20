@@ -16,7 +16,7 @@ void main (int argc, char** argv) {
 	}*/
 	char chaine[] = "USER tts2330a@r-info-onyx.fr";
 	printf("%s\n", traiterChainePart1(chaine));
-	printf("%s\n", traiterChainePart2(chaine)); //si exécution en mm temps : erreur de segmentation
+	printf("%s\n", traiterChainePart2(chaine)); //si exécution en mm temps : 2ème affichage blanc
 }
 
 char* traiterChainePart1(char chaine[]) {
@@ -36,14 +36,13 @@ char* traiterChainePart1(char chaine[]) {
 char* traiterChainePart2(char chaine[]) {
 	char* chaineDecoupee = strtok(chaine, " @"); //la fonction strtok découpe la chaîne selon un délimiteur : @
 	int i=0;
-	char* login="";
+	char* serveur="";
 	while (chaineDecoupee!=NULL) {
 		chaineDecoupee=strtok(NULL, " @");
 		i++;
 		if (i==2) {
-			login=chaineDecoupee;
+			serveur=chaineDecoupee;
 		}
 	}
-	return login;
+	return serveur;
 }
-
