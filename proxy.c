@@ -245,6 +245,3 @@ void socketClient() {
 	buffer[ecode] = '\0';
 	
 }
-
-
-
